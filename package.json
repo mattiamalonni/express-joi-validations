@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/mattiamalonni/express-joi-validations#readme",
   "scripts": {
-    "publish": "npm i && tsup && npm publish"
+    "deploy": "npm i && tsup && npm publish"
   },
   "dependencies": {
     "express": "^4.19.2",
