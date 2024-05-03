@@ -1,12 +1,21 @@
 {
   "name": "express-joi-validations",
-  "version": "0.0.3",
-  "description": "Validate Express request (headers, params, query, body) using Joi",
+  "version": "0.0.4",
+  "description": "Express middleware to validate request (headers, params, query, body) using Joi",
   "license": "MIT",
   "keywords": [
+    "express-middleware",
+    "validation-middleware",
+    "joi-validation",
+    "request-validation",
+    "input-validation",
+    "data-validations",
+    "schema-validation",
+    "input-sanitization",
+    "custom-middleware",
     "express",
-    "joi",
-    "validations"
+    "middleware",
+    "joi"
   ],
   "repository": {
     "type": "git",
@@ -27,7 +36,7 @@
   },
   "homepage": "https://github.com/mattiamalonni/express-joi-validations#readme",
   "scripts": {
-    "build": "tsup"
+    "publish": "npm i && tsup && npm publish"
   },
   "dependencies": {
     "express": "^4.19.2",
