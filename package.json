@@ -1,6 +1,6 @@
 {
   "name": "express-joi-validations",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Validate Express request (headers, params, query, body) using Joi",
   "license": "MIT",
   "keywords": [
