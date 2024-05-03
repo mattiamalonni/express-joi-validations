@@ -1,6 +1,6 @@
 # express-joi-validations
 
-Validate Express request (headers, params, query, body) using Joi
+Express middleware to validate request (headers, params, query, body) using Joi
 
 ## Installation
 
