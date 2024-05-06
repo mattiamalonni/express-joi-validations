@@ -8,17 +8,38 @@ Express middleware to validate request (headers, params, query, body) using Joi
 npm i express-joi-validations
 ```
 
-##### Suggested usage with [express-async-errors](https://github.com/davidbanham/express-async-errors)
-
 ## Usage
 
-```javascript
+### Out of the box
+
+```typescript
 import validate from 'express-joi-validations';
 
-router.put('/posts/:id', validate({ headers: userToken, params: postId, body: postBody }), postsController.update);
+router.put('/posts/:id', validate({ headers: userToken, params: postId, body: postBody }), (request, response) => {
+  // Validation errors will be in request.validationErrors
+  // Validation values will be in request.validationValues
+});
 ```
 
-### validateBody
+### With custom settings
+
+```javascript
+import express from 'express';
+import { expressJoiValidations } from 'express-joi-validations';
+
+const app = express();
+app.use(expressJoiValidations({ validationConfigs }));
+```
+
+#### Configuration
+
+- **throwErrors** (default: false): Define if errors should be thrown (suggested usage with [express-async-errors](https://github.com/davidbanham/express-async-errors))
+
+- **overwriteRequest** (default: false): Define if original request should be overwritten with validated data.
+
+### Helper methods
+
+#### validateBody
 
 ```javascript
 import { Joi, validateBody } from 'express-joi-validations';
@@ -34,7 +55,7 @@ const postBody = Joi.object({
 router.post('/posts', validateBody(postBody), postsController.create);
 ```
 
-### validateParams
+#### validateParams
 
 ```javascript
 import { Joi, validateParams } from 'express-joi-validations';
@@ -48,7 +69,7 @@ const postId = Joi.object({
 router.get('/posts/:id', validateParams(postId), postsController.detail);
 ```
 
-### validateQuery
+#### validateQuery
 
 ```javascript
 import { Joi, validateQuery } from 'express-joi-validations';
@@ -62,7 +83,7 @@ const postQuery = Joi.object({
 router.get('/posts', validateQuery(postQuery), postsController.list);
 ```
 
-### validateHeaders
+#### validateHeaders
 
 ```javascript
 import { Joi, validateHeaders } from 'express-joi-validations';
@@ -76,7 +97,7 @@ const userToken = Joi.object({
 router.delete('/posts/:id', validateHeaders(userToken), postsController.remove);
 ```
 
-#### Chain
+##### Chain
 
 ```javascript
 import { validateHeaders, validateParams, validateBody } from 'express-joi-validations';
@@ -84,7 +105,7 @@ import { validateHeaders, validateParams, validateBody } from 'express-joi-valid
 router.put('/posts/:id', validateHeaders(userToken), validateParams(postId), validateBody(postBody), postsController.update);
 ```
 
-#### Joi options
+##### Joi options
 
 To every function, is possible to add a second parameter to specify custom [Joi Options](https://github.com/hapijs/joi/blob/master/lib/index.d.ts#L95):
 

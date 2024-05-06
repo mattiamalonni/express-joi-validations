@@ -1,42 +1,65 @@
 import { Request, Response, NextFunction } from 'express';
-import { AnySchema, ValidationOptions } from 'joi';
+import { AnySchema, ValidationOptions, ValidationError } from 'joi';
+import type { Entries } from 'type-fest';
 import Config from './config';
 
-export const validate =
-  (validate: { headers?: AnySchema; params?: AnySchema; query?: AnySchema; body?: AnySchema }, options?: ValidationOptions) =>
-  async (req: Request, _: Response, next: NextFunction) => {
-    const { headers, params, query, body } = validate;
+export interface ValidationConfigs {
+  throwErrors?: boolean;
+  overwriteRequest?: boolean;
+}
 
-    if (headers) {
-      const configs = { ...Config.headers, ...options };
-      const { error: headersError, value: headersValue } = headers.validate(req.headers, configs);
-      if (headersError) throw headersError;
-      req.headers = headersValue;
+export interface ValidationErrors {
+  headers?: ValidationError;
+  params?: ValidationError;
+  query?: ValidationError;
+  body?: ValidationError;
+}
+
+export interface ValidationValues {
+  headers?: any;
+  params?: any;
+  query?: any;
+  body?: any;
+}
+export interface ValidationRequest extends Request {
+  validationConfigs?: ValidationConfigs;
+  validationErrors?: ValidationErrors;
+  validationValues?: ValidationValues;
+}
+export interface ValidationProps {
+  headers?: AnySchema;
+  params?: AnySchema;
+  query?: AnySchema;
+  body?: AnySchema;
+}
+
+export const expressJoiValidations = (configs: ValidationConfigs) => (req: ValidationRequest, _: Response, next: NextFunction) => {
+  req.validationConfigs = configs;
+  next();
+};
+
+export const validate = (props: ValidationProps, options?: ValidationOptions) => (req: ValidationRequest, _: Response, next: NextFunction) => {
+  req.validationConfigs ||= {};
+  req.validationErrors ||= {};
+  req.validationValues ||= {};
+
+  const { throwErrors = false, overwriteRequest = false } = req.validationConfigs;
+
+  for (const [key, schema] of Object.entries(props) as Entries<typeof props>) {
+    if (schema) {
+      const configs = { ...Config[key], ...options };
+      const { error, value } = schema.validate(req[key as keyof Request], configs);
+
+      req.validationErrors[key as keyof ValidationErrors] = error;
+      req.validationValues[key as keyof ValidationValues] = value;
+
+      if (error && throwErrors) throw error;
+      if (overwriteRequest) Object.assign(req[key as keyof Request], value);
     }
+  }
 
-    if (params) {
-      const configs = { ...Config.params, ...options };
-      const { error: paramsError, value: paramsValue } = params.validate(req.params, configs);
-      if (paramsError) throw paramsError;
-      req.params = paramsValue;
-    }
-
-    if (query) {
-      const configs = { ...Config.query, ...options };
-      const { error: queryError, value: queryValue } = query.validate(req.query, configs);
-      if (queryError) throw queryError;
-      req.query = queryValue;
-    }
-
-    if (body) {
-      const configs = { ...Config.body, ...options };
-      const { error: bodyError, value: bodyValue } = body.validate(req.body, configs);
-      if (bodyError) throw bodyError;
-      req.body = bodyValue;
-    }
-
-    next();
-  };
+  next();
+};
 
 export const validateHeaders = (headers: AnySchema, options?: ValidationOptions) => validate({ headers }, options);
 export const validateParams = (params: AnySchema, options?: ValidationOptions) => validate({ params }, options);
