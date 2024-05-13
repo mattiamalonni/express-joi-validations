@@ -15,6 +15,10 @@ npm i express-joi-validations
 ```typescript
 import validate from 'express-joi-validations';
 
+// PUT /posts/507f1f77bcf86cd799439011
+// HEADERS: { Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" }
+// BODY: { title: "Lorem ipsum", content: "Lorem ipsum dolor sit amet" }
+
 router.put('/posts/:id', validate({ headers: userToken, params: postId, body: postBody }), (request, response) => {
   // Validation errors will be in request.validationErrors
   // Validation values will be in request.validationValues
